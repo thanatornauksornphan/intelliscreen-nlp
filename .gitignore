@@ -1,5 +1,6 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+*.pyc
 *.py[codz]
 *$py.class
 
@@ -76,7 +77,7 @@ docs/_build/
 target/
 
 # Jupyter Notebook
-.ipynb_checkpoints
+.ipynb_checkpoints/
 
 # IPython
 profile_default/
@@ -150,7 +151,8 @@ activemq-data/
 # Environments
 .env
 .envrc
-.venv
+*.env.local
+.venv/
 env/
 venv/
 ENV/
@@ -216,3 +218,20 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Data & models
+data/raw/
+data/processed/
+*.csv
+*.pkl
+*.pt
+*.h5
+models/*.bin
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
