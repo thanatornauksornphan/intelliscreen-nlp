@@ -222,15 +222,18 @@ __marimo__/
 # Data & models
 data/raw/
 data/processed/
-*.csv
+data/outputs/
+data/samples/
+*.pdf
+*.docx
+!data/samples/*.pdf
+.cache/
 *.pkl
-*.pt
-*.h5
-models/*.bin
 
 # OS junk
 .DS_Store
 Thumbs.db
+.tiff
 
 # Logs
 *.log
