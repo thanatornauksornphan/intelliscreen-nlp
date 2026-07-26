@@ -1,0 +1,34 @@
+# --- Text extraction ---
+PyMuPDF==1.24.9          # PDF text extraction (fast, handles most PDFs well)
+python-docx==1.1.2       # DOCX extraction
+pytesseract==0.3.13      # OCR wrapper (requires Tesseract binary installed separately)
+Pillow==10.4.0           # Image handling
+opencv-python==4.10.0.84 # Image preprocessing for OCR (deskew, threshold, denoise)
+pdf2image==1.17.0        # Convert scanned PDF pages to images for OCR fallback
+
+# --- NLP preprocessing ---
+spacy==3.7.6              # primary NLP pipeline (recommend over NLTK — reason below)
+nltk==3.9.1                # backup/supplementary (stopwords corpus, some utilities)
+
+# --- Vectorization & similarity ---
+scikit-learn==1.5.1        # TF-IDF, CountVectorizer, cosine_similarity
+sentence-transformers==3.0.1  # optional semantic similarity (Phase 4)
+
+# --- Data handling ---
+pandas==2.2.2
+numpy==1.26.4
+
+# --- Visualization ---
+matplotlib==3.9.1
+seaborn==0.13.2
+wordcloud==1.9.3
+
+# --- Optional UI ---
+streamlit==1.37.1          # simpler than Gradio for tabular report display, recommend this over Gradio unless you specifically want a chat-style demo
+
+# --- Utilities ---
+python-dotenv==1.0.1
+tqdm==4.66.4
+
+# --- Optional / heavier (semantic similarity) ---
+sentence-transformers==3.0.1   # CPU-only OK for small batches; slow for large batch runs
