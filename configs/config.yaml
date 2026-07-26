@@ -1,1 +1,9 @@
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+paths:
+  tesseract_cmd: "C:\\Program Files\\Tesseract-OCR\\tesseract.exe"
+  raw_data_dir: "data/raw"
+  processed_data_dir: "data/processed"
+
+extraction:
+  supported_formats: [".pdf", ".docx", ".txt", ".jpg", ".jpeg", ".png"]
+  ocr_dpi: 300
+  min_text_length_for_native_pdf: 20
