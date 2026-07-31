@@ -7,3 +7,12 @@ extraction:
   supported_formats: [".pdf", ".docx", ".txt", ".jpg", ".jpeg", ".png"]
   ocr_dpi: 300
   min_text_length_for_native_pdf: 20
+
+preprocessing:
+  spacy_model: "en_core_web_sm"
+  min_token_length: 2
+  use_lemmatization: true
+  use_stemming: false
+  custom_stopwords: ["exam", "answer", "question", "marks", "page"]
+  protected_terms: ["h2o", "co2", "dna", "rna", "ph"]
+  preserve_numbers: true
