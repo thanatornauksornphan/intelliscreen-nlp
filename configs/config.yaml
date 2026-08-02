@@ -16,3 +16,12 @@ preprocessing:
   custom_stopwords: ["exam", "answer", "question", "marks", "page"]
   protected_terms: ["h2o", "co2", "dna", "rna", "ph"]
   preserve_numbers: true
+
+similarity:
+  method: "tfidf"
+  semantic_model: "all-MiniLM-L6-v2"
+  thresholds:
+    excellent: 0.75
+    good: 0.50
+    poor: 0.0
+  tfidf_ngram_range: [1, 2]
