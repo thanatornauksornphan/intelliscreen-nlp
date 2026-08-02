@@ -25,3 +25,9 @@ similarity:
     good: 0.50
     poor: 0.0
   tfidf_ngram_range: [1, 2]
+
+reporting:
+  output_dir: "data/outputs"
+  top_n_matching_sentences: 3
+  chart_dpi: 150
+  wordcloud_max_words: 100

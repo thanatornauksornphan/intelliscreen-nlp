@@ -1,0 +1,4 @@
+filename,similarity_score,match_level
+../data/samples/Word-Docx.docx,1.0,Excellent
+../data/samples/Native-PDF.pdf,1.0,Excellent
+../data/samples/PNG-Pic.png,1.0,Excellent
