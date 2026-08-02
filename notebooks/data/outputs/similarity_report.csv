@@ -1,4 +1,4 @@
 filename,similarity_score,match_level
-../data/samples/Word-Docx.docx,1.0,Excellent
-../data/samples/Native-PDF.pdf,1.0,Excellent
-../data/samples/PNG-Pic.png,1.0,Excellent
+../data/samples/ANS_DOCX.docx,0.4705,Poor
+../data/samples/ANS_TXT.txt,0.2341,Poor
+../data/samples/ANS_PNG.png,0.2346,Poor
