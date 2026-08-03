@@ -31,22 +31,22 @@ Manually screening large batches of exam answers for content coverage or potenti
 ## Project Structure
 intelliscreen-nlp/
 ├── src/
-│ ├── extraction/ # PDF, DOCX, TXT, and OCR extractors + unified dispatcher
-│ ├── preprocessing/ # spaCy-based text cleaning and tokenization
-│ ├── similarity/ # TF-IDF vectorization, cosine scoring, batch comparison
-│ ├── visualization/ # charts, word clouds, report generation
-│ └── utils/ # logger and config loader
+│ ├── extraction/
+│ ├── preprocessing/
+│ ├── similarity/
+│ ├── visualization/
+│ └── utils/
 ├── data/
-│ ├── raw/ # input files (gitignored)
-│ ├── samples/ # small anonymized example files
-│ ├── processed/ # extracted/preprocessed text (gitignored)
-│ └── outputs/ # generated reports and charts (gitignored)
-├── notebooks/ # phase-by-phase development/testing notebooks
-├── tests/ # pytest suite
+│ ├── raw/
+│ ├── samples/
+│ ├── processed/
+│ └── outputs/
+├── notebooks/
+├── tests/
 ├── configs/
-│ └── config.yaml # central configuration (paths, thresholds, model settings)
-├── logs/ # rotating application logs (gitignored)
-├── main.py # CLI entry point
+│ └── config.yaml
+├── logs/
+├── main.py
 ├── requirements.txt
 ├── requirements-dev.txt
 ├── .pre-commit-config.yaml
