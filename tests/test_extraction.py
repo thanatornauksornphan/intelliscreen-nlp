@@ -1,6 +1,5 @@
 # tests/test_extraction.py
 
-import pytest
 from src.extraction.txt_extractor import extract_text_from_txt
 from src.extraction.extractor import extract_text
 

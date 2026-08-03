@@ -1,7 +1,6 @@
 # main.py
 
 import argparse
-from pathlib import Path
 from src.similarity.batch_comparator import compare_students_to_master
 from src.visualization.report_generator import export_report_csv
 from src.visualization.charts import plot_similarity_bar_chart, plot_match_level_pie

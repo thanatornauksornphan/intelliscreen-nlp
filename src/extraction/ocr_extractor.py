@@ -3,7 +3,6 @@
 import pytesseract
 import cv2
 import numpy as np
-from PIL import Image
 from pdf2image import convert_from_path
 from src.utils.logger import get_logger
 from src.utils.config_loader import load_config
