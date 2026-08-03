@@ -219,22 +219,28 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# Data & models
+# Data (student submissions & generated pipeline artifacts — never commit these)
 data/raw/
 data/processed/
 data/outputs/
-data/samples/
-*.pdf
-*.docx
-!data/samples/*.pdf
+
+# data/samples/ is intentionally NOT listed here — small, anonymized
+# example files in this folder are meant to be committed and tracked.
+
+# Model artifacts (if semantic similarity / embeddings caching is added later)
 .cache/
 *.pkl
+*.pt
+*.h5
 
 # OS junk
 .DS_Store
 Thumbs.db
-.tiff
+*.tiff
 
 # Logs
 *.log
 logs/
+
+# Throwaway environment used for dependency-verification testing
+.venv_test/
