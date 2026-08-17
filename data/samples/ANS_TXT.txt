@@ -1,8 +1,3 @@
-Exam Answer: Cell Membrane Structure and Function
-Student: Variant C (TXT submission)
+Student: Variant C (TXT Submission)
 
-Cells are the basic unit of life and are surrounded by a membrane made of lipids. The cell membrane helps protect the cell from its environment. Some proteins are found within the membrane which help transport certain materials in and out.
-
-The membrane is somewhat selective about what passes through it, but not all types of transport were covered in my notes.
-
-Cells also contain organelles such as the nucleus and mitochondria, which perform different functions like storing genetic material and producing energy through respiration. The nucleus controls the activities of the cell, while mitochondria are known as the powerhouse of the cell.
+Cells are enclosed by a thick wall or membrane made of fats. This outer layer protects the inside of the cell from the dangerous external environment. Some things can pass through it, like water (H2O), but other things cannot. The cell also contains a central nucleus that houses DNA and RNA for genetic instructions. Mitochondria are also present inside the cell to generate power through respiration. I know proteins are involved in the cell somehow, but mostly the membrane just acts as a physical shield against viruses.
