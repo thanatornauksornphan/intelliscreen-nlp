@@ -4,7 +4,9 @@ import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
-LOG_DIR = Path("logs")
+# Anchor to the project root directory
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+LOG_DIR = PROJECT_ROOT / "logs"
 LOG_DIR.mkdir(exist_ok=True)
 
 
@@ -14,7 +16,7 @@ def get_logger(name: str) -> logging.Logger:
         return logger
     logger.setLevel(logging.DEBUG)
 
-    # Uniform Format Console & File Logs
+    # Uniform Format for Console & File Logs
     formatter = logging.Formatter(
         fmt="%(asctime)s | %(levelname)-8s | %(name)s | %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
@@ -25,7 +27,7 @@ def get_logger(name: str) -> logging.Logger:
     console_handler.setLevel(logging.INFO)
     console_handler.setFormatter(formatter)
 
-    # 2. Rotating File Handlers
+    # 2. Rotating File Handler
     log_file = LOG_DIR / "intelliscreen.log"
     file_handler = RotatingFileHandler(
         filename=log_file, maxBytes=5 * 1024 * 1024, backupCount=3, encoding="utf-8"

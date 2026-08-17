@@ -1,36 +1,33 @@
-# --- Text extraction ---
-PyMuPDF==1.24.9          # PDF text extraction (fast, handles most PDFs well)
-python-docx==1.1.2       # DOCX extraction
-pytesseract==0.3.13      # OCR wrapper (requires Tesseract binary installed separately)
-Pillow==10.4.0           # Image handling
-opencv-python==4.10.0.84 # Image preprocessing for OCR (deskew, threshold, denoise)
-pdf2image==1.17.0        # Convert scanned PDF pages to images for OCR fallback (requires Poppler installed separately)
+# --- Document Ingestion & Image Handling ---
+PyMuPDF==1.24.9
+python-docx==1.1.2
+pdf2image==1.17.0
+Pillow==10.4.0
+pytesseract==0.3.13
+opencv-python==4.10.0.84
 
-# --- NLP preprocessing ---
-spacy==3.7.6              # primary NLP pipeline
-nltk==3.9.1                # supplementary (stopwords corpus)
+# --- Deep Learning & VLM (GPU-Accelerated) ---
+transformers>=4.42.0
+accelerate>=0.33.0
+einops>=0.8.0
+sentence-transformers==3.0.1
 
-# --- Vectorization & similarity ---
-scikit-learn==1.5.1        # TF-IDF, CountVectorizer, cosine_similarity
+# --- NLP Preprocessing ---
+spacy==3.7.6
 
-# --- Optional / heavier (semantic similarity) ---
-sentence-transformers==3.0.1   # CPU-only OK for small batches; slow for large batch runs
-
-# --- Data handling ---
+# --- Evaluation, ML & Data Handling ---
+scikit-learn==1.5.1
 pandas==2.2.2
 numpy==1.26.4
 
-# --- Visualization ---
+# --- Visualization & UI ---
 matplotlib==3.9.1.post1
 seaborn==0.13.2
 wordcloud==1.9.3
-
-# --- Optional UI ---
 streamlit==1.37.1
 
-# --- Config ---
+# --- Config & Utilities ---
 PyYAML==6.0.2
-
-# --- Utilities ---
 python-dotenv==1.0.1
 tqdm==4.66.4
+requests>=2.32.0

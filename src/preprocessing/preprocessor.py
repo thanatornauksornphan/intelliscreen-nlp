@@ -13,6 +13,7 @@ class TextPreprocessor:
     def __init__(self):
         config = load_config()
         prep_config = config["preprocessing"]
+        self.method = config["similarity"].get("method", "semantic")
 
         logger.info(f"Loading spaCy model: {prep_config['spacy_model']}")
         self.nlp = spacy.load(prep_config["spacy_model"])
@@ -31,27 +32,27 @@ class TextPreprocessor:
             logger.warning("Empty text passed to preprocess()")
             return []
 
+        # If using Semantic Embeddings, bypass heavy NLP filtering
+        if self.method == "semantic":
+            doc = self.nlp(text.strip())
+            return [token.text for token in doc if not token.is_space]
+
+        # TF-IDF Pipeline: Tokenization, Stopword Removal, Lemmatization
         doc = self.nlp(text.lower())
         tokens = []
 
         for token in doc:
-            # protected terms always survive, checked first
             if token.text in self.protected_terms:
                 tokens.append(token.text)
                 continue
-            # skip stopwords
             if token.text in self.stopwords:
                 continue
-            # skip pure punctuation
             if token.is_punct:
                 continue
-            # skip whitespace tokens
             if token.is_space:
                 continue
-            # optionally skip numbers
             if token.like_num and not self.preserve_numbers:
                 continue
-            # skip short tokens (allow numbers through if preserved)
             if len(token.text) < self.min_token_length and not token.like_num:
                 continue
 
@@ -64,6 +65,9 @@ class TextPreprocessor:
         return tokens
 
     def preprocess_to_string(self, text: str) -> str:
+        if self.method == "semantic":
+            # Return cleaned, natural text with full sentence grammar intact
+            return " ".join(text.split())
         return " ".join(self.preprocess(text))
 
     def generate_ngrams(self, tokens: list[str], n: int = 2) -> list[str]:

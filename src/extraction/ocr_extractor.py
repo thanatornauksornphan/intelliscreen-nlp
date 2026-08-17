@@ -1,66 +1,74 @@
 # src/extraction/ocr_extractor.py
 
-import pytesseract
 import cv2
-import numpy as np
-from pdf2image import convert_from_path
+import pytesseract
+import torch
+from PIL import Image
+from transformers import AutoProcessor, AutoModelForCausalLM
+
 from src.utils.logger import get_logger
 from src.utils.config_loader import load_config
 
 logger = get_logger(__name__)
 config = load_config()
-pytesseract.pytesseract.tesseract_cmd = config["paths"]["tesseract_cmd"]
+
+# --- Initialization ---
+OCR_ENGINE = config["extraction"].get("ocr_engine", "tesseract")
+logger.info(f"Initializing OCR Extractor with engine: {OCR_ENGINE.upper()}")
+
+if OCR_ENGINE == "tesseract":
+    pytesseract.pytesseract.tesseract_cmd = config["paths"]["tesseract_cmd"]
+    processor, model, device = None, None, None
+elif OCR_ENGINE == "florence2":
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model_id = "microsoft/Florence-2-large"
+    try:
+        processor = AutoProcessor.from_pretrained(model_id, trust_remote_code=True)
+        model = AutoModelForCausalLM.from_pretrained(
+            model_id, trust_remote_code=True
+        ).to(device)
+    except Exception as e:
+        logger.error(f"Failed to load VLM: {e}")
+        processor, model = None, None
 
 
-def preprocess_image_for_ocr(image_path: str):
-    logger.info(f"Preprocessed image: {image_path}")
+# --- Internal Extraction Logic ---
+def _run_tesseract(image_path: str) -> str:
     img = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-    if img is None:
-        logger.error(f"cv2 could not read image (corrupt or unsupported): {image_path}")
-        raise ValueError(f"Unreadable image file: {image_path}")
     _, thresh = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-    return thresh
+    return pytesseract.image_to_string(thresh)
 
 
+def _run_vlm(image: Image.Image) -> str:
+    if model is None:
+        raise RuntimeError("VLM Model is not loaded.")
+    prompt = "<OCR>"
+    inputs = processor(text=prompt, images=image, return_tensors="pt").to(device)
+    generated_ids = model.generate(
+        input_ids=inputs["input_ids"],
+        pixel_values=inputs["pixel_values"],
+        max_new_tokens=1024,
+        num_beams=3,
+    )
+    generated_text = processor.batch_decode(generated_ids, skip_special_tokens=False)[0]
+    parsed = processor.post_process_generation(
+        generated_text, task=prompt, image_size=(image.width, image.height)
+    )
+    return parsed.get(prompt, "")
+
+
+# --- Public API ---
 def extract_text_from_image(file_path: str) -> dict:
-    logger.info(f"Extracting text via OCR from: {file_path}")
-    processed = preprocess_image_for_ocr(file_path)
-    text = pytesseract.image_to_string(processed)
-    return {"text": text, "metadata": {"filename": file_path, "char_count": len(text)}}
+    if OCR_ENGINE == "tesseract":
+        text = _run_tesseract(file_path)
+    else:
+        text = _run_vlm(Image.open(file_path).convert("RGB"))
 
-
-def extract_text_from_scanned_pdf(file_path: str) -> dict:
-    logger.info(f"Converting scanned PDF to images: {file_path}")
-
-    dpi = config["extraction"]["ocr_dpi"]
-    pages = convert_from_path(file_path, dpi=dpi)
-
-    text_per_page = []
-
-    for page_num, pil_img in enumerate(pages):
-        logger.debug(f"Running OCR on page {page_num + 1} of {file_path}")
-
-        # 1. Convert PIL Image to OpenCV Format
-        open_cv_image = np.array(pil_img)
-
-        # 2. Convert RGB to Grayscale
-        gray_image = cv2.cvtColor(open_cv_image, cv2.COLOR_RGB2GRAY)
-
-        # 3. Apply Otsu's Thresholding
-        _, thresh = cv2.threshold(
-            gray_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU
-        )
-
-        # 4. Extract Text
-        text = pytesseract.image_to_string(thresh)
-        text_per_page.append(text)
-
-    full_text = "\n".join(text_per_page)
-
-    metadata = {
-        "filename": file_path,
-        "page_count": len(pages),
-        "char_count": len(full_text),
+    return {
+        "text": text,
+        "metadata": {
+            "filename": file_path,
+            "char_count": len(text),
+            "engine": OCR_ENGINE,
+        },
     }
-
-    return {"text": full_text, "metadata": metadata}

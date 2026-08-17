@@ -1,5 +1,7 @@
 # src/similarity/vectorizer.py
 
+import torch
+from sentence_transformers import SentenceTransformer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from src.utils.logger import get_logger
 from src.utils.config_loader import load_config
@@ -7,15 +9,25 @@ from src.utils.config_loader import load_config
 logger = get_logger(__name__)
 
 
-class TfidfSimilarityVectorizer:
+class UnifiedVectorizer:
     def __init__(self):
         config = load_config()
-        sim_config = config["similarity"]
-        ngram_range = tuple(sim_config.get("tfidf_ngram_range", [1, 1]))
+        self.method = config["similarity"].get("method", "semantic")
 
-        self.vectorizer = TfidfVectorizer(ngram_range=ngram_range)
-        logger.info(f"TF-IDF vectorizer initialized with ngram_range={ngram_range}")
+        if self.method == "semantic":
+            model_name = config["similarity"]["semantic_model"]
+            self.device = "cuda" if torch.cuda.is_available() else "cpu"
+            logger.info(
+                f"Initialized Semantic Vectorizer with '{model_name}' on {self.device.upper()}"
+            )
+            self.model = SentenceTransformer(model_name, device=self.device)
+        else:
+            ngram_range = tuple(config["similarity"].get("tfidf_ngram_range", [1, 2]))
+            logger.info(f"Initialized TF-IDF Vectorizer with ngram_range={ngram_range}")
+            self.model = TfidfVectorizer(ngram_range=ngram_range)
 
-    def fit_transform(self, documents: list[str]):
-        logger.debug(f"Fitting TF-IDF on {len(documents)} documents")
-        return self.vectorizer.fit_transform(documents)
+    def transform(self, documents: list[str]):
+        if self.method == "semantic":
+            return self.model.encode(documents, convert_to_tensor=True)
+        else:
+            return self.model.fit_transform(documents)
