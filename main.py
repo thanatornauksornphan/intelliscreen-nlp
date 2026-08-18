@@ -1,6 +1,8 @@
 # main.py
 
 import argparse
+
+from src.similarity.similarity_scorer import UnifiedScorer
 from src.similarity.batch_comparator import compare_students_to_master
 from src.visualization.report_generator import export_report_csv
 from src.visualization.charts import (
@@ -51,6 +53,14 @@ def main():
     logger.info(f"Starting IntelliScreen Run [Engine: {method}]")
     logger.info(f"Master Answer Key: {args.master}")
     logger.info(f"Student Submissions: {len(args.students)} files")
+
+    config = load_config()
+
+    if config.get("llm_reasoning", {}).get("enabled", False):
+        scorer = UnifiedScorer()
+    if not scorer.check_llm_availability():
+        logger.error("LLM reasoning is enabled but Ollama is not ready. Aborting run.")
+        return
 
     # Run screening comparator
     df = compare_students_to_master(args.students, args.master)
