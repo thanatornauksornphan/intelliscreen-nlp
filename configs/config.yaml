@@ -5,7 +5,7 @@ paths:
 
 extraction:
   supported_formats: [".pdf", ".docx", ".txt", ".jpg", ".jpeg", ".png"]
-  ocr_engine: "florence2"
+  ocr_engine: "tesseract" # Options: "tesseract", "florence"
   ocr_dpi: 300
   min_text_length_for_native_pdf: 20
 

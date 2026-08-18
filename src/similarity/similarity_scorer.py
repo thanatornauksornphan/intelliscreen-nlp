@@ -31,6 +31,45 @@ class UnifiedScorer:
         else:
             return "Poor"
 
+    def check_llm_availability(self) -> bool:
+        """One-time startup check: is Ollama reachable and does it have the configured model?
+
+        Call this once before a batch run, not per-row — the per-row generate_feedback()
+        call already handles its own failure gracefully, but a single upfront check gives
+        a clear, immediate signal instead of N silent per-row failures.
+        """
+        if not self.llm_config.get("enabled", False):
+            return True  # LLM reasoning not requested, nothing to check
+
+        model = self.llm_config.get("local_model", "llama3")
+        try:
+            response = requests.get("http://localhost:11434/api/tags", timeout=5)
+            response.raise_for_status()
+            available_models = [m["name"] for m in response.json().get("models", [])]
+
+            # Ollama tags include a version suffix (e.g. "llama3:latest") — match on prefix
+            if not any(m.startswith(model) for m in available_models):
+                logger.error(
+                    f"Ollama is running but model '{model}' is not pulled. "
+                    f"Run: ollama pull {model}"
+                )
+                return False
+
+            logger.info(f"Ollama reachable, model '{model}' available.")
+            return True
+
+        except requests.exceptions.ConnectionError:
+            logger.error(
+                "Could not reach Ollama at http://localhost:11434 — is it running? "
+                "Start it and retry, or set llm_reasoning.enabled: false in config.yaml."
+            )
+            return False
+        except Exception as e:
+            logger.error(
+                f"Unexpected error checking Ollama availability: {e}", exc_info=True
+            )
+            return False
+
     def generate_feedback(
         self, master_text: str, student_text: str, score: float
     ) -> str:

@@ -27,6 +27,9 @@ def plot_similarity_bar_chart(
         return
 
     output_dir, dpi = _get_output_dir()
+    config = load_config()
+    thresholds = config["similarity"]["thresholds"]
+
     plot_df = df.copy()
     plot_df["display_name"] = plot_df["filename"].apply(lambda p: Path(p).name)
 
@@ -40,14 +43,25 @@ def plot_similarity_bar_chart(
         palette=palette,
     )
     plt.axhline(
-        0.85, color="green", linestyle="--", alpha=0.5, label="Excellent Threshold"
+        thresholds["excellent"],
+        color="green",
+        linestyle="--",
+        alpha=0.5,
+        label=f"Excellent Threshold ({thresholds['excellent']:.2f})",
     )
-    plt.axhline(0.65, color="orange", linestyle="--", alpha=0.5, label="Good Threshold")
+    plt.axhline(
+        thresholds["good"],
+        color="orange",
+        linestyle="--",
+        alpha=0.5,
+        label=f"Good Threshold ({thresholds['good']:.2f})",
+    )
     plt.ylim(0, 1.05)
     plt.xticks(rotation=30, ha="right")
     plt.ylabel("Similarity Score")
     plt.xlabel("Submission")
     plt.title("Exam Paper Similarity Scores against Master Key")
+    plt.legend()
     plt.tight_layout()
 
     if save:

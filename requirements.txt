@@ -7,10 +7,20 @@ pytesseract==0.3.13
 opencv-python==4.10.0.84
 
 # --- Deep Learning & VLM (GPU-Accelerated) ---
-transformers>=4.41.2
+# NOTE: torch must be installed separately BEFORE this file, with the CUDA build matching your GPU:
+#   pip install torch --index-url https://download.pytorch.org/whl/cu128
+torch>=2.9.0
+# torchvision is required by timm (Florence-2's vision backbone) — install alongside torch
+# from the same CUDA-specific index: pip install torchvision --index-url https://download.pytorch.org/whl/cu128
+torchvision>=0.17.0
+# Pinned exactly — transformers 5.0+ breaks Florence-2's remote code
+# (AttributeError: 'Florence2LanguageConfig' object has no attribute 'forced_bos_token_id').
+# Do not use >= here until Microsoft updates Florence-2's config code for transformers 5.x.
+transformers==4.51.3
 accelerate>=0.33.0
 einops>=0.8.0
 sentence-transformers==3.0.1
+timm>=0.9.8
 
 # --- NLP Preprocessing ---
 spacy==3.7.6
