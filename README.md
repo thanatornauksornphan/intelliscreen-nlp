@@ -21,41 +21,41 @@ Manually screening large batches of exam answers for content coverage or potenti
 - Centralized YAML configuration, structured logging, and an automated test suite
 
 ## Tech Stack
-- **Language:** Python 3.12
-- **Text extraction:** PyMuPDF (fitz), python-docx, pytesseract, OpenCV, Pillow, pdf2image (requires Poppler)
-- **OCR (VLM path):** transformers, Florence-2-large (`microsoft/Florence-2-large`), timm, torchvision
-- **NLP preprocessing:** spaCy (`en_core_web_sm`)
-- **Vectorization & similarity:** scikit-learn (TF-IDF, cosine similarity) *or* sentence-transformers (`BAAI/bge-large-en-v1.5`)
-- **GPU acceleration:** PyTorch (CUDA 12.8 build, required for current-generation NVIDIA GPUs)
-- **LLM reasoning (optional):** Ollama, running Llama 3 locally
-- **Data handling:** pandas, NumPy
-- **Visualization:** matplotlib, seaborn, wordcloud
-- **Testing & quality:** pytest, ruff, pre-commit
-- **Config & logging:** PyYAML, Python's built-in `logging` (rotating file handler)
+
+| Component | Technology / Library |
+| :--- | :--- |
+| **Language & Testing** | Python 3.12, `pytest`, `ruff`, `pre-commit` |
+| **Text & OCR Extraction** | PyMuPDF, `python-docx`, Tesseract-OCR, Florence-2 Large (`microsoft/Florence-2-large`) |
+| **NLP & Preprocessing** | spaCy (`en_core_web_sm`) |
+| **Vectorization & Models** | scikit-learn (TF-IDF), Sentence-Transformers (`BAAI/bge-large-en-v1.5`), Ollama (Llama 3) |
+| **Data & Visualization** | pandas, NumPy, matplotlib, seaborn, wordcloud |
+| **Acceleration** | PyTorch (CUDA 12.8) |
 
 ## Project Structure
+```text
 intelliscreen-nlp/
 ├── src/
-│ ├── extraction/ # PDF, DOCX, TXT extractors + dual-engine OCR (Tesseract / Florence-2)
-│ ├── preprocessing/ # spaCy-based text cleaning (mode-aware: lexical vs. semantic)
-│ ├── similarity/ # Dual-engine vectorization (TF-IDF / semantic) + scoring + LLM feedback
-│ ├── visualization/ # charts, word clouds, report generation
-│ └── utils/ # logger and config loader
+│   ├── extraction/      # PDF, DOCX, TXT extractors + dual-engine OCR (Tesseract / Florence-2)
+│   ├── preprocessing/   # spaCy-based text cleaning (mode-aware: lexical vs. semantic)
+│   ├── similarity/      # Dual-engine vectorization (TF-IDF / semantic) + scoring + LLM feedback
+│   ├── visualization/   # charts, word clouds, report generation
+│   └── utils/           # logger and config loader
 ├── data/
-│ ├── raw/ # input files (gitignored)
-│ ├── samples/ # small anonymized example files (tracked)
-│ ├── processed/ # extracted/preprocessed text (gitignored)
-│ └── outputs/ # generated reports and charts (gitignored)
-├── notebooks/ # phase-by-phase development/testing notebooks
-├── tests/ # pytest suite
+│   ├── raw/             # input files (gitignored)
+│   ├── samples/         # small anonymized example files (tracked)
+│   ├── processed/       # extracted/preprocessed text (gitignored)
+│   └── outputs/         # generated reports and charts (gitignored)
+├── notebooks/           # phase-by-phase development/testing notebooks
+├── tests/               # pytest suite
 ├── configs/
-│ └── config.yaml # engine selection, thresholds, model settings
-├── logs/ # rotating application logs (gitignored)
-├── main.py # CLI entry point
+│   └── config.yaml      # engine selection, thresholds, model settings
+├── logs/                # rotating application logs (gitignored)
+├── main.py              # CLI entry point
 ├── requirements.txt
 ├── requirements-dev.txt
 ├── .pre-commit-config.yaml
 └── README.md
+```
 
 
 ## Setup & Installation
