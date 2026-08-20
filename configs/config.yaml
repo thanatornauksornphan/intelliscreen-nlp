@@ -17,7 +17,8 @@ preprocessing:
   custom_stopwords: [
     "exam", "answer", "question", "marks", "page", "student", "test",
     "candidate", "figure", "table", "write", "explain", "describe",
-    "outline", "discuss", "points", "grade", "score"
+    "outline", "discuss", "points", "grade", "score",
+    "master", "prompt", "key"
   ]
   protected_terms: [
     "h2o", "co2", "dna", "rna", "ph", "atp", "mrna", "crispr",

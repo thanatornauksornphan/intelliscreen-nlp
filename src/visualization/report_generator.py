@@ -1,9 +1,11 @@
 # src/visualization/report_generator.py
 
-from pathlib import Path
 import re
+from pathlib import Path
+
 import pandas as pd
 import spacy
+
 from src.similarity.similarity_scorer import UnifiedScorer
 from src.utils.config_loader import load_config
 from src.utils.logger import get_logger
@@ -15,7 +17,10 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 try:
     nlp_sentencizer = spacy.blank("en")
     nlp_sentencizer.add_pipe("sentencizer")
-except Exception:
+except Exception as err:  # noqa: BLE001
+    logger.warning(
+        f"Failed to initialize spaCy sentencizer, falling back to regex splitter: {err}"
+    )
     nlp_sentencizer = None
 
 
@@ -35,7 +40,7 @@ def split_into_sentences(text: str) -> list[str]:
 
 
 def top_matching_sentences(
-    student_text: str, master_text: str, vectorizer, top_n: int = None
+    student_text: str, master_text: str, vectorizer, top_n: int | None = None
 ) -> list[str]:
     """Find the top N student sentences semantically most relevant to the master text."""
     config = load_config()
