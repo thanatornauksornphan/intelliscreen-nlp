@@ -233,6 +233,12 @@ data/outputs/
 *.pt
 *.h5
 
+# Local Poppler extraction
+poppler-*/
+
+# Local Ollama model cache
+.ollama/
+
 # OS junk
 .DS_Store
 Thumbs.db
