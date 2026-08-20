@@ -132,10 +132,13 @@ if run_clicked:
     st.success(f"Screening complete — {len(df)} submission(s) scored.")
 
     st.subheader("Results")
+    display_df = df.copy()
+    display_df["filename"] = display_df["filename"].apply(lambda p: Path(p).name)
+
     display_cols = ["filename", "similarity_score", "match_level"]
     if "ai_feedback" in df.columns:
         display_cols.append("ai_feedback")
-    st.dataframe(df[display_cols], use_container_width=True)
+    st.dataframe(display_df[display_cols], use_container_width=True)
 
     st.download_button(
         "Download CSV Report",
