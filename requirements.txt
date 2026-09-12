@@ -21,7 +21,6 @@ accelerate>=0.33.0
 einops>=0.8.0
 sentence-transformers==3.0.1
 timm>=0.9.8
-encore-ml==3.7.0
 
 # --- NLP Preprocessing ---
 spacy==3.7.6
