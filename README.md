@@ -1,4 +1,5 @@
 # IntelliScreen-NLP: Exam Paper Screening using NLP
+![CI](https://github.com/thanatornauksornphan/intelliscreen-nlp/actions/workflows/ci.yml/badge.svg)
 
 ## Overview
 IntelliScreen-NLP is an NLP-based system for screening and evaluating exam answer scripts against a master answer key. It accepts student submissions in multiple formats (PDF, DOCX, TXT, and images/scanned PDFs), extracts and preprocesses the text, and computes similarity scores against a reference answer key to flag how closely each submission matches. The system supports two interchangeable extraction/scoring engines — a lightweight lexical pipeline and a GPU-accelerated semantic pipeline — and outputs detailed reports, visualizations, and exportable CSV results to support human graders, not replace them.

@@ -9,6 +9,7 @@ import pandas as pd
 import seaborn as sns
 import yaml
 
+# Allow running as `python scripts/compare_engines.py` from the project root
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.append(str(PROJECT_ROOT))
 
@@ -21,14 +22,10 @@ CONFIG_PATH = PROJECT_ROOT / "configs" / "config.yaml"
 
 
 def _load_raw_config_text() -> str:
-    """Read config.yaml as raw text (not through the app's cached loader),
-    so we have an exact, byte-for-byte copy to restore afterward."""
     return CONFIG_PATH.read_text(encoding="utf-8")
 
 
 def _write_config_with_method(original_text: str, method: str) -> None:
-    """Temporarily rewrite config.yaml with a different similarity.method,
-    leaving every other setting untouched."""
     config_dict = yaml.safe_load(original_text)
     config_dict["similarity"]["method"] = method
     CONFIG_PATH.write_text(
@@ -39,12 +36,7 @@ def _write_config_with_method(original_text: str, method: str) -> None:
 def run_pass_for_method(
     method: str, master_raw: str, student_raw_texts: dict[str, str]
 ) -> list[dict]:
-    """Instantiate fresh preprocessing/vectorization/scoring components
-    configured for the given method (picked up from the just-rewritten
-    config.yaml), and score every student against the master."""
 
-    # Imported here, not at module top, so each pass re-reads the config
-    # that was just written to disk immediately before this call.
     from src.preprocessing.preprocessor import TextPreprocessor
     from src.similarity.similarity_scorer import UnifiedScorer
     from src.similarity.vectorizer import UnifiedVectorizer
@@ -79,6 +71,21 @@ def run_pass_for_method(
         logger.info(f"[{method.upper()}] {filename}: score={score:.4f} ({level})")
 
     return rows
+
+
+def run_comparison(master_raw: str, student_raw_texts: dict[str, str]) -> list[dict]:
+
+    original_config_text = _load_raw_config_text()
+    all_rows = []
+    try:
+        for method in ["tfidf", "semantic"]:
+            logger.info(f"--- Running {method.upper()} pass ---")
+            _write_config_with_method(original_config_text, method)
+            all_rows.extend(run_pass_for_method(method, master_raw, student_raw_texts))
+    finally:
+        CONFIG_PATH.write_text(original_config_text, encoding="utf-8")
+        logger.info("Restored original config.yaml")
+    return all_rows
 
 
 def main():
@@ -118,19 +125,8 @@ def main():
 
     master_raw = master_result["text"]
 
-    # 2. Run both engine passes, temporarily swapping config.yaml's
-    #    similarity.method between them. The try/finally guarantees the
-    #    original config.yaml is restored even if a pass fails partway.
-    original_config_text = _load_raw_config_text()
-    all_rows = []
-    try:
-        for method in ["tfidf", "semantic"]:
-            logger.info(f"--- Running {method.upper()} pass ---")
-            _write_config_with_method(original_config_text, method)
-            all_rows.extend(run_pass_for_method(method, master_raw, student_raw_texts))
-    finally:
-        CONFIG_PATH.write_text(original_config_text, encoding="utf-8")
-        logger.info("Restored original config.yaml")
+    # 2. Run both engine passes
+    all_rows = run_comparison(master_raw, student_raw_texts)
 
     # 3. Combine results and export
     df = pd.DataFrame(all_rows)

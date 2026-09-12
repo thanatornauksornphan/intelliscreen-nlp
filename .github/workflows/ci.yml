@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Download spaCy language model
+        run: python -m spacy download en_core_web_sm
+
+      # CI runs on an ephemeral checkout that's discarded after the job —
+      # this edit never touches the real repo. It forces the lightweight
+      # TF-IDF path so CI doesn't download the ~1.3GB semantic embedding
+      # model (and doesn't need a GPU) on every single run.
+      - name: Force lightweight config for CI
+        run: |
+          python -c "
+          import yaml
+          with open('configs/config.yaml') as f:
+              config = yaml.safe_load(f)
+          config['similarity']['method'] = 'tfidf'
+          config['extraction']['ocr_engine'] = 'tesseract'
+          config.setdefault('llm_reasoning', {})['enabled'] = False
+          with open('configs/config.yaml', 'w') as f:
+              yaml.safe_dump(config, f, sort_keys=False)
+          "
+
+      - name: Lint with ruff
+        run: |
+          ruff check .
+          ruff format --check .
+
+      - name: Run test suite
+        run: python -m pytest tests/ -v
