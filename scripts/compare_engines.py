@@ -1,7 +1,30 @@
 # scripts/compare_engines.py
 
+"""
+Evaluation script: runs the same student submissions against the same master
+answer key through BOTH similarity engines (TF-IDF and Semantic embeddings),
+and produces a side-by-side comparison table + chart.
+
+This is intended for the thesis evaluation chapter — it answers the question
+"does semantic similarity actually catch paraphrasing better than lexical
+TF-IDF overlap, on the same inputs?" with real numbers instead of just an
+architecture description.
+
+Text extraction (PDF/DOCX/TXT/OCR) is run ONCE and shared across both engine
+passes, since extraction is independent of which similarity method is used —
+only preprocessing and vectorization differ between TF-IDF and semantic mode.
+
+IMPORTANT — run this as a module, from the project root, not as a bare script:
+    python -m scripts.compare_engines --master data/samples/Answer-Variant-A.docx \
+        --students data/samples/Answer-Variant-B.pdf data/samples/Answer-Variant-C.txt
+
+Running it with `-m` from the project root is what lets Python resolve the
+`src` package without any manual sys.path manipulation — running it as
+`python scripts/compare_engines.py` directly will NOT work, since Python
+would only add the scripts/ folder itself to sys.path, not the project root.
+"""
+
 import argparse
-import sys
 from pathlib import Path
 
 import matplotlib.pyplot as plt
@@ -9,23 +32,22 @@ import pandas as pd
 import seaborn as sns
 import yaml
 
-# Allow running as `python scripts/compare_engines.py` from the project root
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-sys.path.append(str(PROJECT_ROOT))
-
 from src.extraction.extractor import extract_text
 from src.utils.logger import get_logger
 
 logger = get_logger("EngineComparison")
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 CONFIG_PATH = PROJECT_ROOT / "configs" / "config.yaml"
 
 
 def _load_raw_config_text() -> str:
+    # Load the original config.yaml text so we can restore it after each engine pass
     return CONFIG_PATH.read_text(encoding="utf-8")
 
 
 def _write_config_with_method(original_text: str, method: str) -> None:
+    # Write a temporary config.yaml with the specified similarity method (tfidf or semantic)
     config_dict = yaml.safe_load(original_text)
     config_dict["similarity"]["method"] = method
     CONFIG_PATH.write_text(
@@ -36,6 +58,7 @@ def _write_config_with_method(original_text: str, method: str) -> None:
 def run_pass_for_method(
     method: str, master_raw: str, student_raw_texts: dict[str, str]
 ) -> list[dict]:
+    # Run a single engine pass (TF-IDF or Semantic) on the same master and student inputs
 
     from src.preprocessing.preprocessor import TextPreprocessor
     from src.similarity.similarity_scorer import UnifiedScorer
@@ -74,6 +97,8 @@ def run_pass_for_method(
 
 
 def run_comparison(master_raw: str, student_raw_texts: dict[str, str]) -> list[dict]:
+    # Run both TF-IDF and Semantic engine passes on the same inputs, and return combined results.
+    # We restore the original config.yaml after each pass to avoid side effects.
 
     original_config_text = _load_raw_config_text()
     all_rows = []
