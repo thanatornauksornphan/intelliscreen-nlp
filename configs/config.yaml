@@ -39,6 +39,10 @@ llm_reasoning:
   enabled: true
   local_model: "llama3"
 
+question_wise:
+  enabled: false
+  marker_pattern: "Q(\\d+)[:.)]"
+
 reporting:
   output_dir: "data/outputs"
   top_n_matching_sentences: 3
