@@ -42,12 +42,14 @@ CONFIG_PATH = PROJECT_ROOT / "configs" / "config.yaml"
 
 
 def _load_raw_config_text() -> str:
-    # Load the original config.yaml text so we can restore it after each engine pass
+    """Read config.yaml as raw text (not through the app's cached loader),
+    so we have an exact, byte-for-byte copy to restore afterward."""
     return CONFIG_PATH.read_text(encoding="utf-8")
 
 
 def _write_config_with_method(original_text: str, method: str) -> None:
-    # Write a temporary config.yaml with the specified similarity method (tfidf or semantic)
+    """Temporarily rewrite config.yaml with a different similarity.method,
+    leaving every other setting untouched."""
     config_dict = yaml.safe_load(original_text)
     config_dict["similarity"]["method"] = method
     CONFIG_PATH.write_text(
@@ -58,8 +60,12 @@ def _write_config_with_method(original_text: str, method: str) -> None:
 def run_pass_for_method(
     method: str, master_raw: str, student_raw_texts: dict[str, str]
 ) -> list[dict]:
-    # Run a single engine pass (TF-IDF or Semantic) on the same master and student inputs
+    """Instantiate fresh preprocessing/vectorization/scoring components
+    configured for the given method (picked up from the just-rewritten
+    config.yaml), and score every student against the master."""
 
+    # Imported here, not at module top, so each pass re-reads the config
+    # that was just written to disk immediately before this call.
     from src.preprocessing.preprocessor import TextPreprocessor
     from src.similarity.similarity_scorer import UnifiedScorer
     from src.similarity.vectorizer import UnifiedVectorizer
@@ -97,9 +103,12 @@ def run_pass_for_method(
 
 
 def run_comparison(master_raw: str, student_raw_texts: dict[str, str]) -> list[dict]:
-    # Run both TF-IDF and Semantic engine passes on the same inputs, and return combined results.
-    # We restore the original config.yaml after each pass to avoid side effects.
+    """Run both TF-IDF and semantic passes, temporarily swapping
+    config.yaml's similarity.method between them.
 
+    The try/finally guarantees the original config.yaml is restored exactly,
+    even if a pass raises partway through.
+    """
     original_config_text = _load_raw_config_text()
     all_rows = []
     try:
